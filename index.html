@@ -1,0 +1,189 @@
+<html>
+
+<!--
+
+  ____
+ / ___|_ __ ___  ___ _ __  _   _
+| |   | '__/ _ \/ _ \ '_ \| | | |
+| |___| | |  __/  __/ |_) | |_| |
+ \____|_|  \___|\___| .__/ \__, |
+                    |_|    |___/
+
+ ____       _                 _     _
+|  _ \ ___ | | __ _ _ __ ___ (_) __| |
+| |_) / _ \| |/ _` | '__/ _ \| |/ _` |
+|  __/ (_) | | (_| | | | (_) | | (_| |
+|_|   \___/|_|\__,_|_|  \___/|_|\__,_|
+
+
+Yes, everything happens in HTML, CSS and JavaScript using Google's Street 
+View and Geocoding APIs: 
+
+* https://developers.google.com/maps/documentation/streetview/
+* https://developers.google.com/maps/documentation/geocoding/
+
+-->
+
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maxiumum-scale=1.0, user-scalable=no" />
+    <title>Creepy Polaroid</title>
+    <link href='http://fonts.googleapis.com/css?family=Reenie+Beanie' rel='stylesheet' type='text/css'>
+    <style>
+      body {
+        font-family: 'Reenie Beanie', cursive;
+        font-size: 30pt;
+        text-align: center;
+        background-color: black;
+      }
+      #pics {
+        width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .pic {
+        padding: 1em 1em 2.0em 1em;
+        background-color: white;
+        margin-top: 20px;
+      }
+      .pic span {
+        font-weight: bold;
+      }
+      img {
+        width: 100%;
+        margin-bottom: 20px;
+      }
+      #intro {
+        display: none;
+      }
+      #fakePic {
+        background-color: pink;
+        height: 500px;
+        padding: 40px;
+        font-size: 35pt;
+      }
+
+      @media (max-width: 400px) {
+        #pics {
+          width: 95%;
+        } 
+        .pic {
+          padding: .5em .5em .5em .5em;
+        }
+        .pic img {
+          margin-bottom: 10px;
+        }
+        .pic span {
+          font-size: 14pt;
+        }
+      }
+
+    </style>
+  </head>
+  <body>
+
+    <div id="pics">
+      <div id="intro" class="pic">
+        <div id="fakePic">
+          <strong>Creepy Polaroid</strong> is a pure HTML/JavaScript app that 
+          shows you a picture from Google Street View for where you are.
+        <br><br>
+        Your browser may be asking you if you want to share your current 
+        location. You'll need to let it, if you want to be 
+        <strong>CREEPED OUT!!!</strong>
+        </div>
+        <span></span>
+      </div>
+    </div>
+
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script>
+
+    var loc;
+
+    function getImage() {
+      navigator.geolocation.getCurrentPosition(setImage);
+    }
+
+    // silly hack to filter out the "image not found" image
+    // hopefully legitimate images won't be of size 8470
+    // and the size of the "image not found" image doesn't change.
+
+    function imageFound(url, cb) {
+      $.ajax(url).done(function(data) {
+        if (data.length != 8470) cb(url);
+      });
+    }
+
+    function setImage(position) {
+      $("#intro").hide();
+
+      // round lon/lat to the nearest thousandth to make imprecise 
+      // geolocation less noisy
+      lon = Math.floor(position.coords.longitude * 10000) / 10000;
+      lat = Math.floor(position.coords.latitude * 10000) / 10000;
+      var newLoc = lat + ',' + lon;
+
+      // if we've moved try to get a new image
+      if (newLoc != loc) {
+        loc = newLoc;
+        console.log("moved to " + loc);
+        var url = 'http://maps.googleapis.com/maps/api/streetview?size=1000x1000&sensor=true&location=' + loc;
+
+        // only display image once the image has been fetched
+        var i = new Image();
+        i.src = url;
+        i.onload = function() {
+
+          // make sure an image was found for the location
+          imageFound(url, function(url) {
+
+            // try to reverse geocode the location to get an address
+            var addr = "http://maps.googleapis.com/maps/api/geocode/json?sensor=true&latlng=" + loc;
+            $.getJSON(addr, function(data) {
+
+              // text defaults to the geo coordinates but will use address
+              // if one was found
+              var text = loc;
+              if (data.results && data.results.length > 0) {
+                text = data.results[0].formatted_address;
+              }
+
+              // add the image element to the DOM and fade it in
+              var pic = $('<div class="pic"><img src="' + url + '"><br><span>' + text + '</span></div>');
+              pic.hide();
+              $("#pics").prepend(pic);
+              pic.fadeIn(2000);
+
+            });
+          });
+        }
+      } else {
+        console.log("haven't moved from " + loc);
+      }
+
+      // check later to see if we've moved
+      setTimeout(getImage, 10000);
+    }
+
+
+    $(function() {
+
+      // display some text about needing to allow the browser to share location
+      // if we haven't seen any activity
+      setTimeout(function() {
+        if (loc == null) {
+          $("#intro").fadeIn(2000);
+        }
+      }, 4000);
+
+      if (navigator.geolocation) {
+        getImage();
+      } else {
+        alert("Sorry you'll need a modern browser if you want to be CREEPED OUT!!");
+      } 
+    });
+
+    </script>
+  </body>
+
+</html>
