@@ -27,7 +27,7 @@ View and Geocoding APIs:
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maxiumum-scale=1.0, user-scalable=no" />
     <title>Creepy Polaroid</title>
-    <link href='http://fonts.googleapis.com/css?family=Reenie+Beanie' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Reenie+Beanie' rel='stylesheet' type='text/css'>
     <style>
       body {
         font-family: 'Reenie Beanie', cursive;
@@ -95,7 +95,7 @@ View and Geocoding APIs:
       </div>
     </div>
 
-    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
     <script>
 
     var loc;
@@ -127,7 +127,7 @@ View and Geocoding APIs:
       if (newLoc != loc) {
         loc = newLoc;
         console.log("moved to " + loc);
-        var url = 'http://maps.googleapis.com/maps/api/streetview?size=1000x1000&sensor=true&location=' + loc;
+        var url = 'https://maps.googleapis.com/maps/api/streetview?size=1000x1000&sensor=true&location=' + loc;
 
         // only display image once the image has been fetched
         var i = new Image();
@@ -138,7 +138,7 @@ View and Geocoding APIs:
           imageFound(url, function(url) {
 
             // try to reverse geocode the location to get an address
-            var addr = "http://maps.googleapis.com/maps/api/geocode/json?sensor=true&latlng=" + loc;
+            var addr = "https://maps.googleapis.com/maps/api/geocode/json?sensor=true&latlng=" + loc;
             $.getJSON(addr, function(data) {
 
               // text defaults to the geo coordinates but will use address
