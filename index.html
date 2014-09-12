@@ -48,7 +48,7 @@ View and Geocoding APIs:
       .pic span {
         font-weight: bold;
       }
-      img {
+      #google-streetview {
         width: 100%;
         margin-bottom: 20px;
       }
@@ -153,7 +153,7 @@ View and Geocoding APIs:
               }
 
               // add the image element to the DOM and fade it in
-              var pic = $('<div class="pic"><img src="' + url + '"><br><span>' + text + '</span></div>');
+              var pic = $('<div class="pic"><img id="google-streetview" src="' + url + '"><br><span>' + text + '</span></div>');
               pic.hide();
               $("#pics").prepend(pic);
               pic.fadeIn(2000);
